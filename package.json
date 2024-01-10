@@ -1,0 +1,26 @@
+{
+  "name": "imagemicrowaverapi",
+  "version": "1.0.0",
+  "description": "api for simple image processing",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khakomaki/image_microwaver_api.git"
+  },
+  "keywords": [
+    "microwaver"
+  ],
+  "author": "Hakomäki Karri",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/khakomaki/image_microwaver_api/issues"
+  },
+  "homepage": "https://github.com/khakomaki/image_microwaver_api#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sharp": "^0.33.1"
+  }
+}

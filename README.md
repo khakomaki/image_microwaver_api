@@ -1,1 +1,3 @@
-# image_microwaver_api
+# Image Microwaver API
+
+Simple image processing API
