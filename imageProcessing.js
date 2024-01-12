@@ -15,7 +15,7 @@ const strech = async (image, intensity) => {
 const saturate = async (image, intensity) => {
     // intensity validation
     if (intensity < -100) { // saturation can't be negative
-        throw new Error(`Given intensity '${intensity}' is invalid (<100)`);
+        throw new Error(`Given intensity '${intensity}' was invalid (<100)`);
     }
 
     // multiplier for saturation
@@ -32,21 +32,43 @@ const reduceFileSize = async (image, intensity) => {
     }
 
     if (intensity < 1 || 100 < intensity) { // jpeg quality has to be in [1-100]
-        throw new Error(`Given intensity '${intensity}' wasnt't in range [1-100]`);
+        throw new Error(`Given intensity '${intensity}' wasn't in range [1-100]`);
     }
 
     // changing intensity -> jpeg quality (flipping min & max)
     const quality = 100 - (intensity - 1);
-
     return sharp(image)
         .jpeg({ quality: quality })
+        .toBuffer();
+};
+
+const reduceResolution = async (image, intensity) => {
+    if (intensity < 0) {
+        throw new Error(`Given intensity '${intensity}' was invalid (<0)`);
+    }
+
+    // image metadata for dimensions
+    const metadata = await sharp(image).metadata();
+
+    // multiplier = 1 / (intensity% + 1) 
+    const resolutionMultiplier = 1 / (0.01 * intensity + 1);
+
+    // higher intensity -> lower quality
+    let newWidth = parseInt(metadata.width * resolutionMultiplier);
+
+    // sets to 1 if becomes too small
+    if (newWidth <= 0) newWidth = 1;
+
+    return sharp(image)
+        .resize({ width: newWidth })
         .toBuffer();
 };
 
 const functions = {
     Normal: strech,
     Defrosting: saturate,
-    Grill: reduceFileSize
+    Grill: reduceFileSize,
+    Popcorn: reduceResolution
 };
 
 const processImage = async (image, mode, intensity) => {
