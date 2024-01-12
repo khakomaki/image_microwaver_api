@@ -16,15 +16,23 @@ app.post('/process-image', upload.single('image'), async (req, res) => {
     const { image, mode, intensity } = req.body;
     const imageBuffer = req.file.buffer;
 
+    // checks that intensity is a number
+    intensityFloat = parseFloat(intensity);
+
+    if (isNaN(intensityFloat)) {
+        return res.status(400).json({ error: `Given intensity '${intensity}' wasn't a number` });
+    }
+
     try {
         // processes image
-        const processedImage = await imageProcessor(imageBuffer, mode, intensity);
+        const processedImage = await imageProcessor(imageBuffer, mode, intensityFloat);
 
         // sends the processed image back
         res.set('Content-Type', 'image/jpeg');
         res.send(processedImage);
     } catch (error) {
         res.status(400).json({ error: error.message });
+        console.log(error.message);
     }
 });
 

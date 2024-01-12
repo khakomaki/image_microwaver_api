@@ -1,11 +1,7 @@
 const sharp = require('sharp');
 
-const strech = async (image, intensity, min=-99, max=100) => {
-    // throws error if the intensity isn't in the range
-    if (intensity < min || max < intensity) {
-        throw new Error(`Given intensity '${intensity}' wasn't in the range [${min} - ${max}]`);
-    }
-
+const strech = async (image, intensity) => {
+    // image metadata for dimensions
     const metadata = await sharp(image).metadata();
 
     // scales width with intensity%
@@ -16,10 +12,10 @@ const strech = async (image, intensity, min=-99, max=100) => {
         .toBuffer();
 };
 
-const saturate = async (image, intensity, min=-100, max=100) => {
-    // throws error if the intensity isn't in the range
-    if (intensity < min || max < intensity) {
-        throw new Error(`Given intensity '${intensity}' wasn't in the range [${min} - ${max}]`);
+const saturate = async (image, intensity) => {
+    // intensity validation
+    if (intensity < -100) { // saturation can't be negative
+        throw new Error(`Given intensity '${intensity}' is invalid (<100)`);
     }
 
     // multiplier for saturation
@@ -29,14 +25,18 @@ const saturate = async (image, intensity, min=-100, max=100) => {
         .toBuffer();
 }
 
-const reduceFileSize = async (image, intensity, min=1, max=100) => {
-    // throws error if the intensity isn't in the range
-    if (intensity < min || max < intensity) {
-        throw new Error(`Given intensity '${intensity}' wasn't in the range [${min} - ${max}]`);
+const reduceFileSize = async (image, intensity) => {
+    // intensity validation
+    if (isNaN(parseInt(intensity))) { // not integer
+        throw new Error(`Given intensity '${intensity}' wasn't integer`);
+    }
+
+    if (intensity < 1 || 100 < intensity) { // jpeg quality has to be in [1-100]
+        throw new Error(`Given intensity '${intensity}' wasnt't in range [1-100]`);
     }
 
     // changing intensity -> jpeg quality (flipping min & max)
-    const quality = max - (intensity - min);
+    const quality = 100 - (intensity - 1);
 
     return sharp(image)
         .jpeg({ quality: quality })
