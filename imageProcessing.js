@@ -72,8 +72,8 @@ const functions = {
 };
 
 const processImage = async (image, mode, intensity) => {
-    // throws error if mode isn't found
-    if (!functions[mode]) {
+    // throws error if mode isn't in the keys
+    if (!Object.keys(functions).includes(mode)) {
         throw new Error(`Unsupported mode: '${mode}'`);
     }
 
@@ -81,4 +81,7 @@ const processImage = async (image, mode, intensity) => {
     return await functions[mode](image, intensity);
 };
 
-module.exports = processImage;
+module.exports = {
+    processImage: processImage,
+    modes: Object.keys(functions)
+};

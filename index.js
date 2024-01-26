@@ -2,7 +2,7 @@ const cors = require('cors');
 const multer = require('multer');
 const express = require('express');
 const bodyParser = require('body-parser');
-const imageProcessor = require('./imageProcessing')
+const { processImage, modes } = require('./imageProcessing')
 const app = express();
 
 const port = 3001;
@@ -36,12 +36,19 @@ app.post('/process-image', (req, res) => {
         // checks that intensity is a number
         intensityFloat = parseFloat(intensity);
         if (isNaN(intensityFloat)) {
+            console.log(`Given intensity wasn't a number`);
             return res.status(400).json({ error: `Given intensity '${intensity}' wasn't a number` });
+        }
+
+        // checks that mode is valid
+        if (!modes.includes(mode)) {
+            console.log(`Given mode wasn't valid`);
+            return res.status(400).json({ error: `Given mode wasn't valid` });
         }
 
         // processes image
         try {
-            const processedImage = await imageProcessor(imageBuffer, mode, intensityFloat);
+            const processedImage = await processImage(imageBuffer, mode, intensityFloat);
 
             // sends the processed image back
             res.set('Content-Type', 'image/jpeg');
