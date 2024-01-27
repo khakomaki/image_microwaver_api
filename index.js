@@ -3,6 +3,7 @@ const multer = require('multer');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { processImage, modes } = require('./imageProcessing')
+const { isSupportedType } = require('./globalFunctions');
 const app = express();
 
 const port = 3001;
@@ -31,7 +32,9 @@ app.post('/process-image', (req, res) => {
         }
         
         const { mode, intensity } = req.body;
+        const filename = req.file.originalname;
         const imageBuffer = req.file.buffer;
+        
 
         // checks that intensity is a number
         intensityFloat = parseFloat(intensity);
@@ -44,6 +47,12 @@ app.post('/process-image', (req, res) => {
         if (!modes.includes(mode)) {
             console.log(`Given mode wasn't valid`);
             return res.status(400).json({ error: `Given mode wasn't valid` });
+        }
+
+        // checks the image is of supported file type
+        if (!isSupportedType(filename)) {
+            console.log(`Uploaded file type wasn't supported`);
+            return res.status(400).json({ error: `Uploaded file type wasn't supported` });
         }
 
         // processes image
