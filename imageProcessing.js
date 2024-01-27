@@ -4,7 +4,13 @@ const sharp = require('sharp');
 const MAX_WIDTH = 7680;
 const MAX_HEIGHT = 4320;
 
-const stretch = async (image, intensity) => {
+/**
+ * Resized image by stretching its width and height, keeping the approximate pixel count.
+ * @param {Buffer} image - image to stretch
+ * @param {number} intensity - how strongly the image is being streched
+ * @returns {Promise<Buffer>} - stretched image
+ */
+async function stretch(image, intensity) {
     // image metadata for dimensions
     const metadata = await sharp(image).metadata();
 
@@ -28,7 +34,13 @@ const stretch = async (image, intensity) => {
         .toBuffer();
 };
 
-const saturate = async (image, intensity) => {
+/**
+ * Saturated image with given intensity.
+ * @param {Buffer} image - image to be saturated
+ * @param {number} intensity - how strongly saturation is applied
+ * @returns {Promise<Buffer>} - saturated image
+ */
+async function saturate(image, intensity) {
     // intensity validation
     if (intensity < -100) { // saturation can't be negative
         throw new Error(`Given intensity '${intensity}' was invalid (<100)`);
@@ -41,7 +53,13 @@ const saturate = async (image, intensity) => {
         .toBuffer();
 }
 
-const reduceFileSize = async (image, intensity) => {
+/**
+ * Reduces image file size by reducing the jpeg quality.
+ * @param {Buffer} image - image to be processed
+ * @param {number} intensity - how strongly quality is decreased (1-100)
+ * @returns {Promise<Buffer>} - image with modified jpeg quality
+ */
+async function reduceFileSize(image, intensity) {
     // intensity validation
     if (isNaN(parseInt(intensity))) { // not integer
         throw new Error(`Given intensity '${intensity}' wasn't integer`);
@@ -58,7 +76,13 @@ const reduceFileSize = async (image, intensity) => {
         .toBuffer();
 };
 
-const reduceResolution = async (image, intensity) => {
+/**
+ * Reduces image resoltution by sizing it down.
+ * @param {Buffer} image - image to be processed
+ * @param {number} intensity - how strongly resolution is decreased
+ * @returns {Promise<Buffer>} - image with reduced resolution
+ */
+async function reduceResolution(image, intensity) {
     if (intensity < 0) {
         throw new Error(`Given intensity '${intensity}' was invalid (<0)`);
     }
@@ -80,6 +104,7 @@ const reduceResolution = async (image, intensity) => {
         .toBuffer();
 };
 
+// available functions
 const functions = {
     Normal: stretch,
     Defrosting: saturate,
@@ -87,7 +112,15 @@ const functions = {
     Popcorn: reduceResolution
 };
 
-const processImage = async (image, mode, intensity) => {
+/**
+ * Processed image with given mode and intensity.
+ * @param {Buffer} image - image to be processed
+ * @param {String} mode - processing mode to be applied
+ * @param {number} intensity - how strongly the mode is applied
+ * @returns {Promise<Buffer>} - processed image
+ * @throws {Error} - if mode isn't supported or error occurs in image processing 
+ */
+async function processImage(image, mode, intensity) {
     // throws error if mode isn't in the keys
     if (!Object.keys(functions).includes(mode)) {
         throw new Error(`Unsupported mode: '${mode}'`);
