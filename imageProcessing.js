@@ -95,12 +95,18 @@ async function reduceResolution(image, intensity) {
 
     // higher intensity -> lower quality
     let newWidth = parseInt(metadata.width * resolutionMultiplier);
+    let newHeight = parseInt(metadata.height * resolutionMultiplier);
 
     // sets to 1 if becomes too small
-    if (newWidth <= 0) newWidth = 1;
+    if (newWidth <= 0)  {
+        newWidth = 1;
+    }
+    if (newHeight <= 0) {
+        newHeight = 1;
+    }
 
     return sharp(image)
-        .resize({ width: newWidth })
+        .resize({ width: newWidth, height: newHeight })
         .toBuffer();
 };
 
