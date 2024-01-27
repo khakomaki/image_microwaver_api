@@ -1,4 +1,4 @@
-const supported_file_types = [ 'JPG', 'JPEG', 'PNG', 'WEBP', 'GIF', 'AVIF', 'TIFF', 'SVG' ];
+const supported_file_types = [ 'JPG', 'JPEG', 'PNG', 'WEBP', 'GIF', 'AVIF', 'TIFF' ];
 
 /**
  * Returns file extension.
@@ -33,5 +33,6 @@ function isSupportedType(filename) {
 }
 
 module.exports = {
+    getExtension,
     isSupportedType
 }

@@ -11,7 +11,7 @@ const MAX_HEIGHT = 4320;
  * @returns {Promise<Buffer>} - stretched image
  */
 async function stretch(image, intensity) {
-    // image metadata for dimensions
+    // image metadata
     const metadata = await sharp(image).metadata();
 
     // scales width and height simultaneously with intensity
@@ -31,6 +31,7 @@ async function stretch(image, intensity) {
     
     return sharp(image)
         .resize({ width: newWidth, height: newHeight, fit: 'fill' })
+        .toFormat(metadata.format)
         .toBuffer();
 };
 
@@ -41,6 +42,9 @@ async function stretch(image, intensity) {
  * @returns {Promise<Buffer>} - saturated image
  */
 async function saturate(image, intensity) {
+    // image metadata
+    const metadata = await sharp(image).metadata();
+
     // intensity validation
     if (intensity < -100) { // saturation can't be negative
         throw new Error(`Given intensity '${intensity}' was invalid (<100)`);
@@ -50,22 +54,28 @@ async function saturate(image, intensity) {
     const saturationMultiplier = 1 + (intensity / 100);
     return sharp(image)
         .modulate({ saturation: saturationMultiplier })
+        .toFormat(metadata.format)
         .toBuffer();
 }
 
 /**
  * Reduces image file size by reducing the jpeg quality.
+ * Keeps the file type after conversion.
  * @param {Buffer} image - image to be processed
  * @param {number} intensity - how strongly quality is decreased (1-100)
  * @returns {Promise<Buffer>} - image with modified jpeg quality
  */
 async function reduceFileSize(image, intensity) {
+    // image metadata
+    const metadata = await sharp(image).metadata();
+
     // intensity validation
     if (isNaN(parseInt(intensity))) { // not integer
         throw new Error(`Given intensity '${intensity}' wasn't integer`);
     }
 
-    if (intensity < 1 || 100 < intensity) { // jpeg quality has to be in [1-100]
+    // jpeg quality has to be in [1-100]
+    if (intensity < 1 || 100 < intensity) {
         throw new Error(`Given intensity '${intensity}' wasn't in range [1-100]`);
     }
 
@@ -73,6 +83,7 @@ async function reduceFileSize(image, intensity) {
     const quality = 100 - (intensity - 1);
     return sharp(image)
         .jpeg({ quality: quality })
+        .toFormat(metadata.format)
         .toBuffer();
 };
 
@@ -107,6 +118,7 @@ async function reduceResolution(image, intensity) {
 
     return sharp(image)
         .resize({ width: newWidth, height: newHeight })
+        .toFormat(metadata.format)
         .toBuffer();
 };
 

@@ -3,7 +3,7 @@ const multer = require('multer');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { processImage, modes } = require('./imageProcessing')
-const { isSupportedType } = require('./globalFunctions');
+const { getExtension, isSupportedType } = require('./globalFunctions');
 const app = express();
 
 const port = 3001;
@@ -33,6 +33,7 @@ app.post('/process-image', (req, res) => {
         
         const { mode, intensity } = req.body;
         const filename = req.file.originalname;
+        const filetype = getExtension(filename);
         const imageBuffer = req.file.buffer;
         
 
@@ -60,7 +61,7 @@ app.post('/process-image', (req, res) => {
             const processedImage = await processImage(imageBuffer, mode, intensityFloat);
 
             // sends the processed image back
-            res.set('Content-Type', 'image/jpeg');
+            res.set('Content-Type', `image/${filetype.toLowerCase()}`);
             res.send(processedImage);
         } catch (error) {
             console.error(`Error in processing image: ${error.message}`);
