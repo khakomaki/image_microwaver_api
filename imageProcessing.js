@@ -1,14 +1,30 @@
 const sharp = require('sharp');
 
-const strech = async (image, intensity) => {
+// maximum dimensions for processed image
+const MAX_WIDTH = 7680;
+const MAX_HEIGHT = 4320;
+
+const stretch = async (image, intensity) => {
     // image metadata for dimensions
     const metadata = await sharp(image).metadata();
 
-    // scales width with intensity%
-    const newWidthScale = 1 + (intensity / 100);
+    // scales width and height simultaneously with intensity
+    const newWidthScale = 1 + (intensity / 200);
     const newWidth = Math.round(metadata.width * newWidthScale);
+    const newHeight = Math.round(metadata.height / newWidthScale);
+
+    // doesn't allow values that pass the maximum dimensions
+    if (MAX_WIDTH < newWidth || MAX_HEIGHT < newHeight ) {
+        throw new Error(`Processed image resolution (${newWidth}x${newHeight}) would exceed maximum dimensions (${MAX_WIDTH}x${MAX_HEIGHT})`);
+    }
+
+    // doesn't allow dimensions under 1
+    if (newWidth < 1 || newHeight < 1) {
+        throw new Error(`Processed image resolution (${newWidth}x${newHeight}) was invalid`);
+    }
+    
     return sharp(image)
-        .resize({ width: newWidth, height: metadata.height, fit: 'fill' })
+        .resize({ width: newWidth, height: newHeight, fit: 'fill' })
         .toBuffer();
 };
 
@@ -65,7 +81,7 @@ const reduceResolution = async (image, intensity) => {
 };
 
 const functions = {
-    Normal: strech,
+    Normal: stretch,
     Defrosting: saturate,
     Grill: reduceFileSize,
     Popcorn: reduceResolution
