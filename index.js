@@ -80,9 +80,16 @@ const server = app.listen(port, () => {
 });
 
 // function for closing the server
-function close() {
-    server.close(() => {
-        console.log("Closed server");
+async function close() {
+    return new Promise((resolve, reject) => {
+        server.close((err) => {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Closed server");
+                resolve();
+            }
+        });
     });
 }
 
