@@ -150,5 +150,9 @@ async function processImage(image, mode, intensity) {
 
 module.exports = {
     processImage: processImage,
-    modes: Object.keys(functions)
+    modes: Object.keys(functions),
+    stretch: stretch,
+    saturate: saturate,
+    reduceFileSize: reduceFileSize,
+    reduceResolution: reduceResolution
 };
