@@ -46,8 +46,8 @@ app.post('/process-image', (req, res) => {
 
         // checks that mode is valid
         if (!modes.includes(mode)) {
-            console.log(`Given mode wasn't valid`);
-            return res.status(400).json({ error: `Given mode wasn't valid` });
+            console.log(`Given mode '${mode}' wasn't valid`);
+            return res.status(400).json({ error: `Given mode '${mode}' wasn't valid` });
         }
 
         // checks the image is of supported file type

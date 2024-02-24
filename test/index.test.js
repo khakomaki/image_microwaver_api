@@ -16,6 +16,16 @@ describe('GET /', () => {
 
 describe('POST /process-image', () => {
     /* ========== parameters ========== */
+    it("should process image", async () => {
+        const response = await request(app)
+            .post('/process-image')
+            .attach('image', basic_image_path)
+            .field('mode', 'Normal')
+            .field('intensity', 50);
+        
+        expect(response.status).toBe(200);
+    });
+
 
     it("should throw error if intensity is invalid", async () => {
         const response = await request(app)
@@ -26,6 +36,17 @@ describe('POST /process-image', () => {
         
         expect(response.status).toBe(400);
         expect(response.body.error).toBe("Given intensity 'invalid-intensity' wasn't a number");
+    });
+
+    it("should throw error if mode is invalid", async () => {
+        const response = await request(app)
+            .post('/process-image')
+            .attach('image', basic_image_path)
+            .field('mode', 'invalid-mode')
+            .field('intensity', 50);
+        
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Given mode 'invalid-mode' wasn't valid");
     });
 
     /* ========== image ========== */
