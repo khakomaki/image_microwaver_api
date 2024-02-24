@@ -74,6 +74,19 @@ app.get('/', (req, res) => {
     res.send(`You've landed on root path`);
 });
 
-app.listen(port, () => {
+// opens server listening to assigned port
+const server = app.listen(port, () => {
     console.log(`Running on http://localhost:${port}`);
 });
+
+// function for closing the server
+function close() {
+    server.close(() => {
+        console.log("Closed server");
+    });
+}
+
+module.exports = {
+    app: app,
+    close: close
+};
