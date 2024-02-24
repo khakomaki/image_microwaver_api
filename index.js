@@ -32,6 +32,24 @@ app.post('/process-image', (req, res) => {
         }
         
         const { mode, intensity } = req.body;
+
+        // checks that parameters were provided
+
+        if (!mode) {
+            console.log("Mode wasn't provided");
+            return res.status(400).json({ error: "Mode wasn't provided" });
+        }
+
+        if (!intensity) {
+            console.log("Intensity wasn't provided");
+            return res.status(400).json({ error: "Intensity wasn't provided" });
+        }
+
+        if (!req.file) {
+            console.log("Image wasn't provided");
+            return res.status(400).json({ error: "Image wasn't provided" });
+        }
+
         const filename = req.file.originalname;
         const filetype = getExtension(filename);
         const imageBuffer = req.file.buffer;

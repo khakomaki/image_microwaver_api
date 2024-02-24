@@ -26,7 +26,6 @@ describe('POST /process-image', () => {
         expect(response.status).toBe(200);
     });
 
-
     it("should throw error if intensity is invalid", async () => {
         const response = await request(app)
             .post('/process-image')
@@ -47,6 +46,39 @@ describe('POST /process-image', () => {
         
         expect(response.status).toBe(400);
         expect(response.body.error).toBe("Given mode 'invalid-mode' wasn't valid");
+    });
+
+    it("should throw error if parameters are missing", async () => {
+        const response = await request(app)
+            .post('/process-image')
+            .attach('image', basic_image_path)
+            .field('mode', 'invalid-mode')
+            // missing intensity field
+        
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Intensity wasn't provided");
+    });
+
+    it("should throw error if parameters are missing", async () => {
+        const response = await request(app)
+            .post('/process-image')
+            .attach('image', basic_image_path)
+            // missing mode field
+            .field('intensity', 50);
+        
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Mode wasn't provided");
+    });
+
+    it("should throw error if parameters are missing", async () => {
+        const response = await request(app)
+            .post('/process-image')
+            // missing image attachment
+            .field('mode', 'invalid-mode')
+            .field('intensity', 50);
+        
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Image wasn't provided");
     });
 
     /* ========== image ========== */
