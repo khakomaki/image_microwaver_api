@@ -33,7 +33,7 @@ async function createTestImage(width, height, red, green, blue) {
 
 describe('Image Processing', () => {
     describe('stretch', () => {
-        it('should stretch the image correctly', async () => {
+        it("should stretch the image correctly", async () => {
             // original image
             const originalMetadata = await sharp(basic_image_path).metadata();
             const originalWidth = originalMetadata.width;
@@ -50,7 +50,7 @@ describe('Image Processing', () => {
             expect(processedMetadata.height).toEqual(expectedHeight);
         });
 
-        it('should stretch the image correctly', async () => {
+        it("should stretch the image correctly", async () => {
             // original image
             const originalWidth = 100;
             const originalHeight = 200;
@@ -65,6 +65,61 @@ describe('Image Processing', () => {
             const expectedHeight = Math.floor(originalHeight / 1.5);
             expect(processedMetadata.width).toEqual(expectedWidth);
             expect(processedMetadata.height).toEqual(expectedHeight);
+        });
+
+        it("should keep the resolution if processed with 0 intensity", async () => {
+            // original image
+            const originalMetadata = await sharp(basic_image_path).metadata();
+            const originalWidth = originalMetadata.width;
+            const originalHeight = originalMetadata.height;
+
+            // processed image
+            const processedImage = await imageProcessing.stretch(basic_image_buffer, 0);
+            const processedMetadata = await sharp(processedImage).metadata();
+
+            // expected values
+            expect(processedMetadata.width).toEqual(originalWidth);
+            expect(processedMetadata.height).toEqual(originalHeight);
+        });
+
+        it("should throw error if new width would become too large", async () => {
+            // original image
+            const originalWidth = 7680;
+            const originalHeight = 4320;
+            const originalImage = await createTestImage(originalWidth, originalHeight, 255, 255, 255); // full white image 100x200
+
+            // processed image
+            await expect(imageProcessing.stretch(originalImage, 50)).rejects.toThrowError();
+        });
+
+        it("should throw error if new height would become too large", async () => {
+            // original image
+            const originalWidth = 7680;
+            const originalHeight = 4320;
+            const originalImage = await createTestImage(originalWidth, originalHeight, 255, 255, 255); // full white image 100x200
+
+            // processed image
+            await expect(imageProcessing.stretch(originalImage, -50)).rejects.toThrowError();
+        });
+
+        it("should throw error if new height would become invalid", async () => {
+            // original image
+            const originalWidth = 100;
+            const originalHeight = 1;
+            const originalImage = await createTestImage(originalWidth, originalHeight, 255, 255, 255); // full white image 100x200
+
+            // processed image
+            await expect(imageProcessing.stretch(originalImage, 500)).rejects.toThrowError();
+        });
+
+        it("should throw error if new width would become invalid", async () => {
+            // original image
+            const originalWidth = 1;
+            const originalHeight = 200;
+            const originalImage = await createTestImage(originalWidth, originalHeight, 255, 255, 255); // full white image 100x200
+
+            // processed image
+            await expect(imageProcessing.stretch(originalImage, -500)).rejects.toThrowError();
         });
     });
 });
